@@ -35,45 +35,53 @@ func main() {
 		ReadTimeout:  15 * time.Second,
 	}
 	startserver.StartStatusServer()
-	status := common.StatusResponse{
-		ServiceName:        "Hello World Example Services",
-		ServiceDescription: "A service that exists so documentation can be written for it.",
-		Status:             "available",
-		SubComponents:      nil,
-	}
-
-	err := common.UpdateAndSendStatus(status)
-	if err != nil {
-		fmt.Print("error")
-	}
-	time.Sleep(15 * time.Second)
-	failStatus := common.StatusResponse{
-		ServiceName:        "Database disconnection",
-		ServiceDescription: "It is killed by Bob",
-		Status:             "unavailable",
-		SubComponents:      nil,
-	}
-	err = common.UpdateAndSendStatus(failStatus)
-	if err != nil {
-		fmt.Print("error")
-	}
-
-	time.Sleep(15 * time.Second)
-	recoverStatus := common.StatusResponse{
-		ServiceName:        "Database recovered",
-		ServiceDescription: "It is killed by Bob",
-		Status:             "available",
-		SubComponents:      nil,
-	}
-	err = common.UpdateAndSendStatus(recoverStatus)
-	if err != nil {
-		fmt.Print("error")
-	}
-
-	err = helloWorldServer.ListenAndServe()
+	err := helloWorldServer.ListenAndServe()
 	if err != nil {
 		fmt.Print(err.Error())
 	}
+
+	 func running() {
+		status := common.StatusResponse{
+			ServiceName:        "Hello World Example Services",
+			ServiceDescription: "A service that exists so documentation can be written for it.",
+			Status:             "available",
+			SubComponents:      nil,
+		}
+
+		err = common.UpdateAndSendStatus(status)
+		if err != nil {
+			fmt.Print("error")
+		}
+		time.Sleep(15 * time.Second)
+		failStatus := common.StatusResponse{
+			ServiceName:        "Database disconnection",
+			ServiceDescription: "It is killed by Bob",
+			Status:             "unavailable",
+			SubComponents:      nil,
+		}
+		err = common.UpdateAndSendStatus(failStatus)
+		if err != nil {
+			fmt.Print("error")
+		}
+
+		time.Sleep(15 * time.Second)
+		recoverStatus := common.StatusResponse{
+			ServiceName:        "Database recovered",
+			ServiceDescription: "It is killed by Bob",
+			Status:             "available",
+			SubComponents:      nil,
+		}
+		err = common.UpdateAndSendStatus(recoverStatus)
+		if err != nil {
+			fmt.Print("error")
+		}
+
+		err = helloWorldServer.ListenAndServe()
+		if err != nil {
+			fmt.Print(err.Error())
+		}
+	}
+	go running()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill)
