@@ -62,7 +62,7 @@ func main() {
 	recoverStatus := common.StatusResponse{
 		ServiceName:        "Database recovered",
 		ServiceDescription: "It is killed by Bob",
-		Status:             "unavailable",
+		Status:             "available",
 		SubComponents:      nil,
 	}
 	err = common.UpdateAndSendStatus(recoverStatus)
