@@ -23,10 +23,11 @@ func SetupService(r *mux.Router, prefix string) {
 }
 
 func main() {
+	var err error
 
 	helloWorldRouter := mux.NewRouter()
 
-	SetupService(helloWorldRouter, "/v2/comodoca")
+	SetupService(helloWorldRouter, "/v1/comodoca")
 
 	helloWorldServer := &http.Server{
 		Handler:      helloWorldRouter,
@@ -34,13 +35,17 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-	startserver.StartStatusServer()
-	err := helloWorldServer.ListenAndServe()
-	if err != nil {
-		fmt.Print(err.Error())
-	}
 
-	 func running() {
+	startserver.StartStatusServer()
+
+	go func() {
+		err = helloWorldServer.ListenAndServe()
+		if err != nil {
+			fmt.Print(err.Error())
+		}
+	}()
+
+	go func() {
 		status := common.StatusResponse{
 			ServiceName:        "Hello World Example Services",
 			ServiceDescription: "A service that exists so documentation can be written for it.",
@@ -80,8 +85,7 @@ func main() {
 		if err != nil {
 			fmt.Print(err.Error())
 		}
-	}
-	go running()
+	}()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill)
