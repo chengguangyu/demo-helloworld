@@ -27,6 +27,7 @@ func main() {
 	var err error
 
 	helloWorldRouter := mux.NewRouter()
+	serverName := "helloWorld"
 
 	SetupService(helloWorldRouter, "/v1/comodoca")
 
@@ -38,7 +39,7 @@ func main() {
 	}
 
 	startserver.StartStatusServer()
-	startlogger.StartLoggerServer("helloworld")
+	startlogger.StartLogServer(serverName)
 
 	go func() {
 		err = helloWorldServer.ListenAndServe()
@@ -53,6 +54,7 @@ func main() {
 			ServiceDescription: "A service that exists so documentation can be written for it.",
 			Status:             "available",
 			SubComponents:      nil,
+			VersionNumber:      "2.0",
 		}
 
 		err = common.UpdateAndSendStatus(status)
@@ -65,6 +67,7 @@ func main() {
 			ServiceDescription: "It is killed by Bob",
 			Status:             "unavailable",
 			SubComponents:      nil,
+			VersionNumber:      "2.0",
 		}
 		err = common.UpdateAndSendStatus(failStatus)
 		if err != nil {
@@ -77,6 +80,7 @@ func main() {
 			ServiceDescription: "It is killed by Bob",
 			Status:             "available",
 			SubComponents:      nil,
+			VersionNumber:      "2.0",
 		}
 		err = common.UpdateAndSendStatus(recoverStatus)
 		if err != nil {
