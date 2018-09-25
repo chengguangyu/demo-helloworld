@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/comodo/comodo-logging-lib/startlogger"
 	"github.com/comodo/comodoca-status-api/common"
 	"github.com/comodo/comodoca-status-api/startserver"
 	"github.com/gorilla/mux"
@@ -37,6 +38,7 @@ func main() {
 	}
 
 	startserver.StartStatusServer()
+	startlogger.StartLoggerServer("helloworld")
 
 	go func() {
 		err = helloWorldServer.ListenAndServe()
