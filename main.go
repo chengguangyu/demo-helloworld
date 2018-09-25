@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/comodo/comodo-logging-lib/startlogger"
+	"github.com/comodo/comodo-logging-lib/stoplogger"
 	"github.com/comodo/comodoca-status-api/common"
 	"github.com/comodo/comodoca-status-api/startserver"
+	"github.com/comodo/comodoca-status-api/stopserver"
 	"github.com/gorilla/mux"
 	"net/http"
 	"os"
@@ -77,7 +79,7 @@ func main() {
 		time.Sleep(15 * time.Second)
 		recoverStatus := common.StatusResponse{
 			ServiceName:        "Database recovered",
-			ServiceDescription: "It is killed by Bob",
+			ServiceDescription: "It is fixed by Bob",
 			Status:             "available",
 			SubComponents:      nil,
 			VersionNumber:      "2.0",
@@ -101,5 +103,8 @@ func main() {
 	defer cancel()
 
 	helloWorldServer.Shutdown(ctx)
+	stopserver.StopStatusServer()
+	stoplogger.StopLogger()
+
 	os.Exit(0)
 }
