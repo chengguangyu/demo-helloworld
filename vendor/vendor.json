@@ -3,10 +3,103 @@
 	"ignore": "",
 	"package": [
 		{
+			"checksumSHA1": "hWmSaeljplYrdAaBQLO5jRoS7Xk=",
+			"path": "github.com/comodo/comodo-logging-lib/config",
+			"revision": "9b5b687bf8bbc1a28d951a90adeae3df871fcd03",
+			"revisionTime": "2018-09-26T12:56:02Z"
+		},
+		{
+			"checksumSHA1": "8Kn9OotDa7jlA+jVR8qkDMa/imk=",
+			"path": "github.com/comodo/comodo-logging-lib/startlogger",
+			"revision": "9b5b687bf8bbc1a28d951a90adeae3df871fcd03",
+			"revisionTime": "2018-09-26T12:56:02Z"
+		},
+		{
+			"checksumSHA1": "vnBX1OFRfz0Vj06oWDSiLsePBRs=",
+			"path": "github.com/comodo/comodo-logging-lib/stoplogger",
+			"revision": "9b5b687bf8bbc1a28d951a90adeae3df871fcd03",
+			"revisionTime": "2018-09-26T12:56:02Z"
+		},
+		{
+			"checksumSHA1": "/RaZSK2SD3crucUbKCA07dHQtc8=",
+			"path": "github.com/comodo/comodoca-status-api/common",
+			"revision": "04f6a5a8ee7ff61c694de9f6425d03bd9ecd841e",
+			"revisionTime": "2018-09-26T12:57:15Z"
+		},
+		{
+			"checksumSHA1": "s/KlXXwl1RSPhLH4TjL1QHd1ZZ8=",
+			"path": "github.com/comodo/comodoca-status-api/src/controller",
+			"revision": "04f6a5a8ee7ff61c694de9f6425d03bd9ecd841e",
+			"revisionTime": "2018-09-26T12:57:15Z"
+		},
+		{
+			"checksumSHA1": "nNkIW011331+wk6XdAprS3iE7kI=",
+			"path": "github.com/comodo/comodoca-status-api/src/routers",
+			"revision": "04f6a5a8ee7ff61c694de9f6425d03bd9ecd841e",
+			"revisionTime": "2018-09-26T12:57:15Z"
+		},
+		{
+			"checksumSHA1": "gEx4wCM6dzDAI138BW+gHeeHtfg=",
+			"path": "github.com/comodo/comodoca-status-api/startserver",
+			"revision": "04f6a5a8ee7ff61c694de9f6425d03bd9ecd841e",
+			"revisionTime": "2018-09-26T12:57:15Z"
+		},
+		{
+			"checksumSHA1": "cHi+KTqGSY3MSN1PG7OKiRgIFJI=",
+			"path": "github.com/comodo/comodoca-status-api/stopserver",
+			"revision": "04f6a5a8ee7ff61c694de9f6425d03bd9ecd841e",
+			"revisionTime": "2018-09-26T12:57:15Z"
+		},
+		{
+			"checksumSHA1": "63ko/Viude7gsJwTJI/mIVrUErA=",
+			"path": "github.com/fatih/color",
+			"revision": "2d684516a8861da43017284349b7e303e809ac21",
+			"revisionTime": "2018-05-16T10:03:07Z"
+		},
+		{
 			"checksumSHA1": "1lWSALooNQN3f4yBefa6XoDoo5w=",
 			"path": "github.com/gorilla/mux",
 			"revision": "9e1f5955c0d22b55d9e20d6faa28589f83b2faca",
 			"revisionTime": "2018-09-03T15:43:05Z"
+		},
+		{
+			"checksumSHA1": "ehZjU7jss0XLcZ0K5QWdgAQQ7iI=",
+			"origin": "github.com/fatih/color/vendor/github.com/mattn/go-colorable",
+			"path": "github.com/mattn/go-colorable",
+			"revision": "2d684516a8861da43017284349b7e303e809ac21",
+			"revisionTime": "2018-05-16T10:03:07Z"
+		},
+		{
+			"checksumSHA1": "75JRBMb6jYtCE10+0Ocek5oblf8=",
+			"origin": "github.com/fatih/color/vendor/github.com/mattn/go-isatty",
+			"path": "github.com/mattn/go-isatty",
+			"revision": "2d684516a8861da43017284349b7e303e809ac21",
+			"revisionTime": "2018-05-16T10:03:07Z"
+		},
+		{
+			"checksumSHA1": "DbaMwpb/3rlAmWYIMpgpSQkJ0f4=",
+			"path": "github.com/robfig/cron",
+			"revision": "b41be1df696709bb6395fe435af20370037c0b4c",
+			"revisionTime": "2018-05-05T20:34:41Z"
+		},
+		{
+			"checksumSHA1": "BhFvGn5gZPrWiGhwWK29NXeOHV0=",
+			"path": "github.com/streadway/amqp",
+			"revision": "70e15c650864f4fc47f5d3c82ea117285480895d",
+			"revisionTime": "2018-08-06T23:38:56Z"
+		},
+		{
+			"checksumSHA1": "QaSqAbf/wrmqHcSUCQHeiOgmyHQ=",
+			"origin": "github.com/fatih/color/vendor/golang.org/x/sys/unix",
+			"path": "golang.org/x/sys/unix",
+			"revision": "2d684516a8861da43017284349b7e303e809ac21",
+			"revisionTime": "2018-05-16T10:03:07Z"
+		},
+		{
+			"checksumSHA1": "85bWiNde/HxfO7VjrdQxvrWfe9U=",
+			"path": "gopkg.in/natefinch/lumberjack.v2",
+			"revision": "a96e63847dc3c67d17befa69c303767e2f84e54f",
+			"revisionTime": "2017-05-31T16:03:50Z"
 		}
 	],
 	"rootPath": "github.com/comodo/comodoca-helloworld"
