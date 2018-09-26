@@ -25,11 +25,17 @@ func SetupService(r *mux.Router, prefix string) {
 	s.HandleFunc("/helloworld", HelloWorldHandler).Methods("GET")
 }
 
+func init() {
+
+}
+
 func main() {
 	var err error
 
 	helloWorldRouter := mux.NewRouter()
 	serverName := "helloWorld"
+	hostname, _ := os.Hostname()
+	Log := startlogger.Logger{}
 
 	SetupService(helloWorldRouter, "/v1/comodoca")
 
@@ -41,7 +47,7 @@ func main() {
 	}
 
 	startserver.StartStatusServer()
-	startlogger.StartLogServer(serverName)
+	startlogger.StartLogServer(serverName, hostname, Log)
 
 	go func() {
 		err = helloWorldServer.ListenAndServe()
@@ -51,6 +57,7 @@ func main() {
 	}()
 
 	go func() {
+
 		status := common.StatusResponse{
 			ServiceName:        "Hello World Example Services",
 			ServiceDescription: "A service that exists so documentation can be written for it.",
@@ -63,10 +70,12 @@ func main() {
 		if err != nil {
 			fmt.Print("error")
 		}
+		Log.Printf("guys, the hello world is damn started")
+
 		time.Sleep(15 * time.Second)
 		failStatus := common.StatusResponse{
 			ServiceName:        "Database disconnection",
-			ServiceDescription: "It is killed by Bob",
+			ServiceDescription: "It is damaged by Bob",
 			Status:             "unavailable",
 			SubComponents:      nil,
 			VersionNumber:      "2.0",
@@ -75,6 +84,7 @@ func main() {
 		if err != nil {
 			fmt.Print("error")
 		}
+		Log.Warnf("%s", "something bad happens, the database is broken")
 
 		time.Sleep(15 * time.Second)
 		recoverStatus := common.StatusResponse{
@@ -88,11 +98,7 @@ func main() {
 		if err != nil {
 			fmt.Print("error")
 		}
-
-		err = helloWorldServer.ListenAndServe()
-		if err != nil {
-			fmt.Print(err.Error())
-		}
+		Log.Print("Bob is the best, he fixed the database")
 	}()
 
 	c := make(chan os.Signal, 1)
@@ -103,8 +109,8 @@ func main() {
 	defer cancel()
 
 	helloWorldServer.Shutdown(ctx)
-	stopserver.StopStatusServer()
-	stoplogger.StopLogger()
+	stopserver.StopStatusServer(ctx)
+	stoplogger.StopLogger(Log)
 
 	os.Exit(0)
 }
