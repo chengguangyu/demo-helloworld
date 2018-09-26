@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/comodo/comodo-logging-lib/startlogger"
-	"github.com/comodo/comodo-logging-lib/stoplogger"
+	"github.com/comodo/comodoca-logging-lib/startlogger"
+	"github.com/comodo/comodoca-logging-lib/stoplogger"
 	"github.com/comodo/comodoca-status-api/common"
 	"github.com/comodo/comodoca-status-api/startserver"
 	"github.com/comodo/comodoca-status-api/stopserver"

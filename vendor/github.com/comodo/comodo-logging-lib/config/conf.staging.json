@@ -1,9 +1,0 @@
-{
-  "logFile":   "comodoca-staging",
-  "logPath":   "/logs",
-  "maxSize":    500,
-  "maxBackups": 0,
-  "maxAge":     90,
-  "rollOver":  "24h",
-  "rabbitMQUrl": "amqp://guest:guest@localhost:5672/"
-}
