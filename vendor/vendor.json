@@ -3,16 +3,16 @@
 	"ignore": "",
 	"package": [
 		{
-			"checksumSHA1": "HA/CmIKvDf5cZL+/bzCT7thUhEY=",
+			"checksumSHA1": "cw8oneGT71VJUv+Sg1cysAEc6uE=",
 			"path": "github.com/comodo/comodoca-logging-lib/startlogger",
-			"revision": "9b5b687bf8bbc1a28d951a90adeae3df871fcd03",
-			"revisionTime": "2018-09-26T12:56:02Z"
+			"revision": "e50ea94998de3be7365c16244ef9834b9bc92fc7",
+			"revisionTime": "2018-09-26T13:56:08Z"
 		},
 		{
-			"checksumSHA1": "9RWTTOM2JXbY1nabSGAimlI4VhE=",
+			"checksumSHA1": "i/5FMzCgMJBIF5wgrRoKDa5rigs=",
 			"path": "github.com/comodo/comodoca-logging-lib/stoplogger",
-			"revision": "9b5b687bf8bbc1a28d951a90adeae3df871fcd03",
-			"revisionTime": "2018-09-26T12:56:02Z"
+			"revision": "e50ea94998de3be7365c16244ef9834b9bc92fc7",
+			"revisionTime": "2018-09-26T13:56:08Z"
 		},
 		{
 			"checksumSHA1": "/RaZSK2SD3crucUbKCA07dHQtc8=",
