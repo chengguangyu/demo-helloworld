@@ -7,6 +7,7 @@ import (
 	"github.com/streadway/amqp"
 	"log"
 	"runtime"
+	"sync"
 	"time"
 )
 
@@ -16,6 +17,8 @@ const WARNING = "wrn"
 const ERROR = "err"
 const FYI = "fyi"
 const PANIC = "panic"
+
+var routingKeys map[string]string
 
 type LogMessage struct {
 	Id    string
@@ -31,13 +34,14 @@ var logChannel *amqp.Channel
 
 type LoggerInterface interface {
 	Connect(RabbitMQUrl string, serverName string, hostName string, fatal bool)
-	CreateQueue(ch *amqp.Channel) bool
+	CreateQueue(ch *amqp.Channel) amqp.Queue
 	CreateTopicExchange(ch *amqp.Channel) bool
-	BindQueuesToExchange(ch *amqp.Channel, qName string, keys []string)
+	CreateConsumer(ch *amqp.Channel, q amqp.Queue) <-chan amqp.Delivery
+	BindQueueToExchange(ch *amqp.Channel, q amqp.Queue, routingKey string)
 	GetLoggerChannel() *amqp.Channel
-	GetLoggerQueue() amqp.Queue
 	ShutDown()
-	ParseLog(ch *amqp.Channel, qName string)
+	StartReceiver(ch *amqp.Channel) []amqp.Delivery
+	ConsumeMsgs(msgs []amqp.Delivery)
 	PrintLocally(printLocal bool)
 	Warn(v ...interface{})
 	Warnf(format string, v ...interface{})
@@ -68,7 +72,6 @@ type Logger struct {
 	LoggerInterface
 	rabbitCh     *amqp.Channel
 	rabbitConn   *amqp.Connection
-	rabbitQueue  amqp.Queue
 	printLocally bool
 }
 
@@ -101,26 +104,6 @@ func (logger *Logger) GetLoggerChannel() *amqp.Channel {
 	return logger.rabbitCh
 }
 
-func (logger *Logger) GetLoggerQueue() amqp.Queue {
-	return logger.rabbitQueue
-}
-
-func (logger *Logger) CreateQueue(ch *amqp.Channel) bool {
-
-	q, err := ch.QueueDeclare(
-		"",    // name
-		true,  // durable
-		false, // delete when unused
-		false, // exclusive
-		false, // no-wait
-		nil,   // arguments
-	)
-	failOnError(err, "Failed to declare a queue")
-	fmt.Print("logger started")
-	logger.rabbitQueue = q
-	return true
-}
-
 func (logger *Logger) CreateTopicExchange(ch *amqp.Channel) bool {
 
 	err := ch.ExchangeDeclare(
@@ -135,16 +118,41 @@ func (logger *Logger) CreateTopicExchange(ch *amqp.Channel) bool {
 	failOnError(err, "Failed to declare a topic")
 	return true
 }
-func (logger *Logger) BindQueuesToExchange(ch *amqp.Channel, qName string, keys []string) {
-	for _, routingKey := range keys {
-		err := ch.QueueBind(
-			qName,
-			routingKey,
-			"logs",
-			false,
-			nil)
-		failOnError(err, "Failed to bind a queue")
-	}
+func (logger *Logger) CreateQueue(ch *amqp.Channel, qName string) amqp.Queue {
+	q, err := ch.QueueDeclare(
+		qName, // name
+		true,  // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
+	)
+	failOnError(err, "Failed to declare a queue")
+	return q
+}
+
+func (logger *Logger) BindQueueToExchange(ch *amqp.Channel, q amqp.Queue, routingKey string) {
+	err := ch.QueueBind(
+		q.Name,
+		routingKey,
+		"logs",
+		false,
+		nil)
+	failOnError(err, "Failed to bind a queue")
+}
+
+func (logger *Logger) CreateConsumer(ch *amqp.Channel, q amqp.Queue) <-chan amqp.Delivery {
+	msgs, err := ch.Consume(
+		q.Name,
+		"",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	failOnError(err, "Failed to register a consumer")
+	return msgs
 }
 
 func (logger *Logger) publishLog(text string, level string) {
@@ -156,12 +164,14 @@ func (logger *Logger) publishLog(text string, level string) {
 	if err != nil {
 		fmt.Println("error:", err)
 	}
+	key := GetRoutingKey(level, routingKeys)
+	fmt.Print(key)
 
 	err = logChannel.Publish(
-		"logs",               // exchange
-		GetRoutingKey(level), // routing key
-		false,                // mandatory
-		false,                // immediate
+		"logs",                            // exchange
+		GetRoutingKey(level, routingKeys), // routing key
+		false,                             // mandatory
+		false,                             // immediate
 		amqp.Publishing{
 			DeliveryMode: amqp.Persistent,
 			ContentType:  "text/plain",
@@ -170,33 +180,52 @@ func (logger *Logger) publishLog(text string, level string) {
 	failOnError(err, "Failed to publish a message")
 }
 
-func (logger *Logger) ParseLog(ch *amqp.Channel, qName string) {
+func (logger *Logger) StartReceiver(ch *amqp.Channel) []<-chan amqp.Delivery {
 
-	msgs, err := ch.Consume(
-		qName,
-		"",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	failOnError(err, "Failed to register a consumer")
+	routingKeys = LoadRoutingKeys()
+	delivers := make([]<-chan amqp.Delivery, 1)
 
-	forever := make(chan bool)
+	for level, routingKey := range routingKeys {
+		q := logger.CreateQueue(ch, level)
+		logger.BindQueueToExchange(ch, q, routingKey)
+		msgs := logger.CreateConsumer(ch, q)
+		fmt.Print(msgs)
+		delivers = append(delivers, msgs)
+	}
+	return delivers
+}
+func (logger *Logger) ConsumeMsgs(delivers []<-chan amqp.Delivery) {
+	forever := make(chan int, 50)
+	var wg sync.WaitGroup
+	wg.Add(len(delivers))
+	for _, msgs := range delivers {
 
-	go func() {
-		for msg := range msgs {
-			logMsg := LogMessage{}
-			if err := json.Unmarshal(msg.Body, &logMsg); err != nil {
-				fmt.Printf("Cannot parse the log message: %s\n", err)
-				return
+		go func(msgs <-chan amqp.Delivery) {
+			for msg := range msgs {
+				_, ok := <-forever
+				if !ok {
+					wg.Done()
+					return
+				}
+				logMsg := LogMessage{}
+
+				if err := json.Unmarshal(msg.Body, &logMsg); err != nil {
+					fmt.Printf("Cannot parse the log message: %s\n", err)
+					return
+				}
+				msg.Ack(false)
+				PrintMsg(logMsg)
+
 			}
-			msg.Ack(false)
-			PrintMsg(logMsg)
-		}
-	}()
-	<-forever
+			log.Println("waiting for logs")
+		}(msgs)
+
+	}
+	for i := 0; i < 50; i++ {
+		forever <- i
+	}
+	close(forever)
+	wg.Wait()
 }
 
 func (logger *Logger) publishLogId(text string, level string, id string) {
@@ -208,10 +237,10 @@ func (logger *Logger) publishLogId(text string, level string, id string) {
 		fmt.Println("error:", err)
 	}
 	err = logChannel.Publish(
-		"logs",               // exchange
-		GetRoutingKey(level), // routing key
-		false,                // mandatory
-		false,                // immediate
+		"logs",                            // exchange
+		GetRoutingKey(level, routingKeys), // routing key
+		false,                             // mandatory
+		false,                             // immediate
 		amqp.Publishing{
 			DeliveryMode: amqp.Persistent,
 			ContentType:  "text/plain",

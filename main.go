@@ -25,15 +25,11 @@ func SetupService(r *mux.Router, prefix string) {
 	s.HandleFunc("/helloworld", HelloWorldHandler).Methods("GET")
 }
 
-func init() {
-
-}
-
 func main() {
 	var err error
 
 	helloWorldRouter := mux.NewRouter()
-	serverName := "helloWorld"
+	serverName := "iot-api-services"
 	hostname, _ := os.Hostname()
 	Log := startlogger.Logger{}
 
@@ -72,7 +68,7 @@ func main() {
 		}
 		Log.Printf("guys, the hello world is damn started")
 
-		time.Sleep(15 * time.Second)
+		time.Sleep(2 * time.Second)
 		failStatus := common.StatusResponse{
 			ServiceName:        "Database disconnection",
 			ServiceDescription: "It is damaged by Bob",
@@ -83,10 +79,12 @@ func main() {
 		err = common.UpdateAndSendStatus(failStatus)
 		if err != nil {
 			fmt.Print("error")
+			Log.Fatal("%e", err)
 		}
-		Log.Warnf("%s", "something bad happens, the database is broken")
+		Log.Warn("something bad happens, the database is broken")
 
-		time.Sleep(15 * time.Second)
+		//Log.Print("really bad, fixing")
+
 		recoverStatus := common.StatusResponse{
 			ServiceName:        "Database recovered",
 			ServiceDescription: "It is fixed by Bob",
